@@ -288,7 +288,7 @@
     <thead>
       <tr>
         <th>Description</th>
-        <% if @invoice.have_items_discount? %>
+        <% if invoice.have_items_discount? %>
         <th>Price</th>
         <th>Discount</th>
         <% end %>
@@ -296,14 +296,14 @@
       </tr>
     </thead>
     <tbody>
-      <% @invoice.items.each do |item| %>
+      <% invoice.items.each do |item| %>
         <tr>
           <td><%= item.description %></td>
-          <% if @invoice.have_items_discount? %>
-          <td><%= display_money item.base_amount, @invoice.currency %></td>
+          <% if invoice.have_items_discount? %>
+          <td><%= display_money item.base_amount, invoice.currency %></td>
           <td><% if item.discount > 0 %><%= item.discount %>%<% end %></td>
           <% end %>
-          <td class="total"><%= display_money item.net_amount, @invoice.currency %></td>
+          <td class="total"><%= display_money item.net_amount, invoice.currency %></td>
         </tr>
       <% end %>
     </tbody>
