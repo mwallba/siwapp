@@ -12,11 +12,7 @@ class InvoiceMailer < ApplicationMailer
     subject_template = email_template.subject
 
     # Getting pdf templates
-    if @invoice.print_template
-      print_template = @invoice.print_template.template
-    else
-      print_template = Template.find_by(print_default: true).template
-    end
+    print_template = @invoice.get_print_template.template
     # Rendering the and composing mail content
     pdf_html = render_to_string :inline => print_template,
       :locals => {:invoice => @invoice, :settings => Settings}
