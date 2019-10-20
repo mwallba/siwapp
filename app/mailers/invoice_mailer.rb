@@ -7,19 +7,22 @@ class InvoiceMailer < ApplicationMailer
 
     # Getting email template
     email_template = @invoice.get_email_template
-    # E-mail parts
-    body_template = email_template.template
-    subject_template = email_template.subject
 
-    # Getting pdf templates
-    print_template = @invoice.get_print_template.template
     # Rendering the and composing mail content
-    pdf_html = render_to_string :inline => print_template,
-      :locals => {:invoice => @invoice, :settings => Settings}
-    email_subject = render_to_string :inline => subject_template,
-      :locals => {:invoice => @invoice, :settings => Settings}
-    email_body = render_to_string :inline => body_template,
-      :locals => {:invoice => @invoice, :settings => Settings}
+    pdf_html = render_invoice_html(
+      template: @invoice.get_print_template.template,
+      invoice: @invoice
+    )
+    email_subject = render_invoice_html(
+      template: OpenStruct.new(template: email_template.subject)
+      invoice: @invoice
+    )
+
+    email_body = render_invoice_html(
+      template: email_template,
+      invoice: @invoice
+    )
+
     attachments["#{@invoice}.pdf"] = @invoice.pdf(pdf_html)
 
     # Sending the email
@@ -31,5 +34,17 @@ class InvoiceMailer < ApplicationMailer
     ) do |format|
       format.html {email_body}
     end
+  end
+
+  private
+
+  def render_invoice_html(template:, invoice:)
+    render_to_string(
+      inline: template.template,
+      locals: {
+        invoice: invoice,
+        settings: Settings
+      }
+    )
   end
 end

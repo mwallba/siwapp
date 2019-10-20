@@ -140,8 +140,11 @@ class Api::V1::CommonsController < Api::V1::BaseController
   def print_template
     @invoice = Invoice.find(params[:invoice_id])
     @print_template = Template.find(params[:id])
-    html = render_to_string :inline => @print_template.template,
-      :locals => {:invoice => @invoice, :settings => Settings}
+    html = render_invoice_html(
+      template: @print_template,
+      invoice: @invoice
+    )
+
     respond_to do |format|
       format.html { render inline: html }
       format.pdf do
@@ -152,6 +155,16 @@ class Api::V1::CommonsController < Api::V1::BaseController
         )
       end
     end
+  end
+
+  def render_invoice_html(template:, invoice:)
+    render_to_string(
+      inline: template.template,
+      locals: {
+        invoice: invoice,
+        settings: Settings
+      }
+    )
   end
 
   def not_found

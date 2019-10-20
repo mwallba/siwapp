@@ -67,8 +67,10 @@ class InvoicesController < CommonsController
   # Renders a common's template in html and pdf formats
   def print
     @invoice = Invoice.find(params[:id])
-    html = render_to_string :inline => @invoice.get_print_template.template,
-      :locals => {:invoice => @invoice, :settings => Settings}
+    html = render_invoice_html(
+      template: @invoice.get_print_template.template,
+      invoice: @invoice
+    )
     respond_to do |format|
       format.html { render inline: html }
       format.pdf do
@@ -103,14 +105,13 @@ class InvoicesController < CommonsController
         end
         flash[:info] = "Successfully set as paid #{total} invoices."
       when 'pdf'
-        html = ''
-        invoices.each do |inv|
+        html = invoices.each_with_object(String.new) do |inv, string|
           @invoice = inv
-          html += render_to_string \
-              :inline => inv.get_print_template.template,
-              :locals => {:invoice => @invoice,
-                          :settings => Settings}
-          html += '<div class="page-break" style="page-break-after:always;"></div>'
+          string += render_invoice_html(
+            template: inv.get_print_template.template,
+            invoice: @invoice
+          )
+          string += '<div class="page-break" style="page-break-after:always;"></div>'
         end
         send_data(@invoice.pdf(html),
           :filename => "invoices.pdf",
@@ -158,5 +159,17 @@ class InvoicesController < CommonsController
         :_destroy
       ]
     ]
+  end
+
+  private
+
+  def render_invoice_html(template:, invoice:)
+    render_to_string(
+      :inline => template.template,
+      :locals => {
+        :invoice => invoice,
+        :settings => Settings
+      }
+    )
   end
 end

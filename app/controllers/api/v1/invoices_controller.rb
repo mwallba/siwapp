@@ -7,8 +7,10 @@ class Api::V1::InvoicesController < Api::V1::CommonsController
   def template
     @invoice = Invoice.find(params[:invoice_id])
     @template = Template.find(params[:id])
-    html = render_to_string :inline => @template.template,
-      :locals => {invoice: @invoice, settings: Settings}
+    html = render_invoice_html(
+      template: @template,
+      invoice: @invoice
+    )
     respond_to do |format|
       format.pdf do
         pdf = @invoice.pdf(html)
@@ -74,6 +76,13 @@ class Api::V1::InvoicesController < Api::V1::CommonsController
   end
 
   private
+
+  def render_invoice_html(template:, invoice:)
+    render_to_string(
+      :inline => template.template,
+      :locals => {invoice: invoice, settings: Settings}
+    )
+  end
 
   def get_stats_dates_values params
     date_from = (params[:q].nil? or params[:q][:issue_date_gteq].nil?) ? Date.current.beginning_of_year : Date.parse(params[:q][:issue_date_gteq])
