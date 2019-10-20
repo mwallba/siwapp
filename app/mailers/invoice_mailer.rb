@@ -13,8 +13,9 @@ class InvoiceMailer < ApplicationMailer
       template: @invoice.get_print_template.template,
       invoice: @invoice
     )
+
     email_subject = render_invoice_html(
-      template: OpenStruct.new(template: email_template.subject)
+      template: OpenStruct.new(template: email_template.subject),
       invoice: @invoice
     )
 
