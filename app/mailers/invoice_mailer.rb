@@ -10,7 +10,7 @@ class InvoiceMailer < ApplicationMailer
 
     # Rendering the and composing mail content
     pdf_html = render_invoice_html(
-      template: @invoice.get_print_template.template,
+      template: @invoice.get_print_template,
       invoice: @invoice
     )
 

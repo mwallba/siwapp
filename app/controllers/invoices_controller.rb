@@ -68,7 +68,7 @@ class InvoicesController < CommonsController
   def print
     @invoice = Invoice.find(params[:id])
     html = render_invoice_html(
-      template: @invoice.get_print_template.template,
+      template: @invoice.get_print_template,
       invoice: @invoice
     )
     respond_to do |format|
@@ -108,7 +108,7 @@ class InvoicesController < CommonsController
         html = invoices.each_with_object(String.new) do |inv, string|
           @invoice = inv
           string += render_invoice_html(
-            template: inv.get_print_template.template,
+            template: inv.get_print_template,
             invoice: @invoice
           )
           string += '<div class="page-break" style="page-break-after:always;"></div>'
